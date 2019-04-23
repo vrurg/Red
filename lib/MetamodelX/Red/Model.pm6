@@ -83,7 +83,7 @@ multi method set-id(Red::Model:D $model, $id --> Hash()) {
 }
 
 multi method id-map(Red::Model $model, $id --> Hash()) {
-    $model.^id.head => $id
+    $model.^id.head.name.substr(2) => $id
 }
 
 multi method id-filter(Red::Model:D $model) {
@@ -328,7 +328,6 @@ method create(\model, *%orig-pars) is rw {
     my $data := $obj.^save(:insert, :from-create).row;
 
     for %positionals.kv -> $name, @val {
-        say $obj.^attributes.first(*.name.substr(2) eq "columns").get_value: $obj for @val;
         $obj."$name"().create: |$_ for @val
     }
     self.apply-row-phasers($obj, AfterCreate);
