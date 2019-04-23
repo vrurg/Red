@@ -67,7 +67,11 @@ multi method translate(Red::AST::Value $_ where .type ~~ UUID, $context?) {
 class Statement does Red::Statement {
     has Str $.query;
     method stt-exec($stt, *@bind) {
-        my $s = $stt.query($!query, |(@bind or @!binds));
+        my $db = $stt.db;
+        my $sth = $db.prepare($!query);
+        my $s = $sth.execute(|(@bind or @!binds));
+        $db.finish;
+        # my $s = $stt.query($!query, |(@bind or @!binds));
         do if $s ~~ DB::Pg::Results {
             $s.hashes
         } else {
